@@ -5,7 +5,7 @@ import {Platform } from 'react-native';
 
 import Colors from '../constants/Colors';
 
-const CustomButtom = props => {
+const CustomButton = props => {
     return <HeaderButton 
        {...props}
        IconComponent={Ionicons}
@@ -14,4 +14,4 @@ const CustomButtom = props => {
     />
 }
 
-export default CustomButtom;
+export default CustomButton;

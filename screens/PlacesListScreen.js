@@ -1,12 +1,18 @@
-import React from 'react';
-import {StyleSheet, View, Text, Platform, FlatList} from 'react-native';
+import React, { useEffect} from 'react';
+import {StyleSheet, Platform, FlatList} from 'react-native';
 import { HeaderButtons, Item} from 'react-navigation-header-buttons';
-import { useSelector } from 'react-redux';
-import CustomButtom from '../components/HeaderButton';
+import { useSelector, useDispatch } from 'react-redux';
+import CustomButton from '../components/HeaderButton';
 import PlaceItem from '../components/PlaceItem';
+import { loadPlaces } from '../store/action/place';
 
 const PlacesListScreen = props => {
     const places = useSelector(state => state.places.places);
+    const dispatch = useDispatch();
+    
+    useEffect(() => {
+        dispatch(loadPlaces());
+    }, [dispatch]);
 
     return (
        <FlatList
@@ -14,10 +20,10 @@ const PlacesListScreen = props => {
           keyExtractor={item => item.id}
           renderItem={itemData => <PlaceItem
               title={itemData.item.title}
-              image={null}
-              address={null}
+              image={itemData.item.imageUri}
+              address={itemData.item.address}
               onSelect={() => {
-                  props.navigation.navigate('Placedetail', {
+                  props.navigation.navigate('PlaceDetail', {
                       placeTitle: itemData.item.title,
                       placeId: itemData.item.id
                   });
@@ -29,8 +35,8 @@ const PlacesListScreen = props => {
 
 PlacesListScreen.navigationOptions = (navData) => {
     return {
-        headerTitile: 'All Places',
-        headerRight: () => <HeaderButtons HeaderButtonComponent={CustomButtom}>
+        headerTitle: 'All Places',
+        headerRight: () => <HeaderButtons HeaderButtonComponent={CustomButton}>
             <Item
                 title='Add Place'
                 iconName={Platform.OS === 'android' ? 'md-add' : 'ios-add'}

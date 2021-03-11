@@ -1,12 +1,15 @@
-import React, {useState} from 'react';
-import { ScrollView, StyleSheet, View, Text, TextInput, Button } from 'react-native';
+import React, {useState, useCallback} from 'react';
+import { ScrollView, StyleSheet, View, Text, TextInput, Button, Platform } from 'react-native';
 import { useDispatch } from 'react-redux';
 import ImgPicker from '../components/ImagePicker';
 import { addPlace } from '../store/action/place';
+import LocationPicker from '../components/LocationPicker';
 import Colors from '../constants/Colors';
 
 const NewPlaceScreen = props => {
     const [title, setTitle] = useState('');
+    const [location, setLocation] = useState('');
+    const [selectedImageUri, setSelectedImageUri] = useState();
     const dispatch = useDispatch();
 
     const titleChangeHandler = text => {
@@ -14,29 +17,42 @@ const NewPlaceScreen = props => {
     }
 
     const savePlaceHandler = () => {
-        dispatch(addPlace(title));
+        dispatch(addPlace(title, selectedImageUri, location.lat, location.lng));
         props.navigation.navigate('Places');
     }
 
+    const handleImageTaken = (uri) => {
+        setSelectedImageUri(uri);
+    }
+
+    const pickedLocationHandler = useCallback((location) => {
+        setLocation(location);
+    }, []);
+
     return (
-        <ScrollView>
+        <ScrollView style={styles.wrapper}>
             <View style={styles.form}> 
-              <Text style={styles.label}>Titile</Text>
+              <Text style={styles.label}>Title</Text>
               <TextInput style={styles.testInput} onChangeText={titleChangeHandler} value={title} />
-              <ImgPicker/>
-              <Button title='Save Place'  color={Colors.primary} onPress={savePlaceHandler} />
+              <ImgPicker onImageTaken={handleImageTaken}/>
+              <View style={styles.location}>
+                 <LocationPicker navigation={props.navigation} onLocationSelected={pickedLocationHandler}/>
+              </View>
+              <Button title='Save Place'  style={styles.button} color={Colors.primary} onPress={savePlaceHandler} />
             </View>  
         </ScrollView>
     )
 }
 
 NewPlaceScreen.navigationOptions = {
-    headerTitile: 'Add Place'
+    headerTitle: 'Add Place'
 }
 
 const styles = StyleSheet.create({
+    wrapper: {
+    },
     form: {
-        margin: 30
+        margin: 30,
     },
     label: {
         fontSize: 18,
@@ -48,6 +64,9 @@ const styles = StyleSheet.create({
         marginBottom: 25,
         paddingVertical: 4,
         paddingHorizontal: 2
+    },
+    location: {
+        marginVertical: 20
     }
 });
 
